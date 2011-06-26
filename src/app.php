@@ -34,8 +34,8 @@ $app->error(function(Exception $e) use ($app){
 
 $app->match('/', function() use ($app) {
     
-    $form = $app['form.factory']->createBuilder('form')
-        ->add('FileUpload', 'file')            
+    $form = $app['form.factory']->createBuilder('form')	
+        ->add('FileUpload', 'file')
     ->getForm();
     
     $request = $app['request'];
@@ -48,8 +48,8 @@ $app->match('/', function() use ($app) {
                 $files = $request->files->get($form->getName());
                 /* Make sure the Upload Directory is properly configured and writeable */
                 $path = __DIR__.'/../web/upload/';                
-                $filename = $files['FileUpload']['file']->getOriginalName();
-                $files['FileUpload']['file']->move($path,$filename);
+                $filename = $files['FileUpload']->getClientOriginalName();
+                $files['FileUpload']->move($path,$filename);
                                
         }
         return $app['twig']->render('index.html.twig', array(

@@ -42,7 +42,7 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
-        if (!$objectManager['mappings'] && $objectManager['auto_mapping']) {
+        if ($objectManager['auto_mapping']) {
             // automatically register bundle mappings
             foreach (array_keys($container->getParameter('kernel.bundles')) as $bundle) {
                 if (!isset($objectManager['mappings'][$bundle])) {
@@ -52,7 +52,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
-            if (false === $mappingConfig) {
+            if (null !== $mappingConfig && false === $mappingConfig['mapping']) {
                 continue;
             }
 
@@ -168,6 +168,7 @@ abstract class AbstractDoctrineExtension extends Extension
         if (!$bundleConfig['prefix']) {
             $bundleConfig['prefix'] = $bundle->getNamespaceName().'\\'.$this->getMappingObjectDefaultName();
         }
+
         return $bundleConfig;
     }
 
@@ -193,9 +194,9 @@ abstract class AbstractDoctrineExtension extends Extension
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
                 if ($driverType == 'annotation') {
-                    $args[1] = array_merge($driverPaths, $args[1]);
+                    $args[1] = array_merge(array_values($driverPaths), $args[1]);
                 } else {
-                    $args[0] = array_merge($driverPaths, $args[0]);
+                    $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 }
                 $mappingDriverDef->setArguments($args);
             } else if ($driverType == 'annotation') {
@@ -209,6 +210,10 @@ abstract class AbstractDoctrineExtension extends Extension
                 ));
             }
             $mappingDriverDef->setPublic(false);
+            if (false !== strpos($mappingDriverDef->getClass(), 'yml') || false !== strpos($mappingDriverDef->getClass(), 'xml')) {
+                $mappingDriverDef->addMethodCall('setNamespacePrefixes', array(array_flip($driverPaths)));
+                $mappingDriverDef->addMethodCall('setGlobalBasename', array('mapping'));
+            }
 
             $container->setDefinition($mappingService, $mappingDriverDef);
 
@@ -263,11 +268,12 @@ abstract class AbstractDoctrineExtension extends Extension
         }
         $container->addResource(new FileResource($resource));
 
-        if (($files = glob($dir.'/'.$configPath.'/*.xml')) && count($files)) {
+        $extension = $this->getMappingResourceExtension();
+        if (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) && count($files)) {
             return 'xml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.yml')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.yml')) && count($files)) {
             return 'yml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.php')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.php')) && count($files)) {
             return 'php';
         }
 
@@ -306,4 +312,11 @@ abstract class AbstractDoctrineExtension extends Extension
      * @return string
      */
     abstract protected function getMappingResourceConfigDirectory();
+
+    /**
+     * Extension used by the mapping files.
+     *
+     * @return string
+     */
+    abstract protected function getMappingResourceExtension();
 }
