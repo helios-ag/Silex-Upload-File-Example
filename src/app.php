@@ -7,7 +7,10 @@ require_once __DIR__.'/../vendor/Silex/silex.phar';
 $app = new Silex\Application;
 
 $app->register(new \Silex\Extension\TwigExtension(), array(
-    'twig.path' => __DIR__.'/templates',
+    'twig.path' => array(
+        __DIR__.'/templates',
+        __DIR__ . '/../vendor/symfony/src/Symfony/Bridge/Twig/Resources/views/Form'
+    ),
     'twig.class_path' => __DIR__.'/../vendor/Twig/lib',
 ));
 
