@@ -6,20 +6,28 @@ require_once __DIR__.'/../vendor/Silex/silex.phar';
 
 $app = new Silex\Application;
 
-$app->register(new \Silex\Extension\TwigExtension(), array(
-    'twig.path' => __DIR__.'/templates',
+use Silex\Extension\SymfonyBridgesExtension;
+use Silex\Extension\TranslationExtension;
+use Silex\Extension\FormExtension;
+use Silex\Extension\TwigExtension;
+
+$app->register(new TwigExtension(), array(
+    'twig.path'       => array(
+	  __DIR__.'/templates',
+	  __DIR__.'/../vendor/symfony/src/Symfony/Bridge/Twig/Resources/views/Form'
+	),
     'twig.class_path' => __DIR__.'/../vendor/Twig/lib',
 ));
 
-$app->register(new \Silex\Extension\SymfonyBridgesExtension(), array(
+$app->register(new SymfonyBridgesExtension(), array(
    'symfony_bridges.class_path' => __DIR__ . '/../vendor/symfony/src'
 ));
 
-$app->register(new \Silex\Extension\FormExtension(), array(
+$app->register(new FormExtension(), array(
     'form.class_path' => __DIR__ . '/../vendor/symfony/src'
 ));
 
-$app->register(new \Silex\Extension\TranslationExtension(), array(
+$app->register(new TranslationExtension(), array(
     'translation.class_path' => __DIR__ . '/../vendor/symfony/src',
     'translator.messages' => array()
 ));
