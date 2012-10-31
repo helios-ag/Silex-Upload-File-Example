@@ -1,2 +1,5 @@
 /.idea/
-/vendor/Silex/
+composer.lock
+composer.phar
+/vendor/
+
