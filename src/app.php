@@ -1,29 +1,26 @@
 <?php
 
-require_once __DIR__.'/../vendor/Silex/silex.phar';
+error_reporting(E_ALL | E_STRICT); 
+ini_set('display_errors', 1);
+ini_set('log_errors', 0);
+
+require_once __DIR__.'/../vendor/autoload.php';
 
 /**  Bootstraping */
 
+use Symfony\Component\HttpFoundation\Request;
 use Silex\Provider\FormServiceProvider;
 
 $app = new Silex\Application();
 
-$app->register(new Silex\Provider\SymfonyBridgesServiceProvider(), array(
-    'symfony_bridges.class_path'  => __DIR__.'/../vendor/symfony/src',
-));
-
-$app->register(new Silex\Provider\FormServiceProvider(), array(
-    'form.class_path' => __DIR__ . '/../vendor/symfony/src'
-));
+$app->register(new FormServiceProvider());
 
 $app->register(new Silex\Provider\TranslationServiceProvider(), array(
-    'locale_fallback'           => 'en',
-    'translation.class_path'    => __DIR__.'/../vendor/symfony/src',
+    'locale_fallback'           => 'en'
 ));
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path'       => __DIR__.'/views',
-    'twig.class_path' => __DIR__.'/../vendor/twig/lib',
+    'twig.path'       => __DIR__.'/views'
 ));
 
 
@@ -33,7 +30,7 @@ $app['debug'] = true;
 
 /** App definition */
 
-$app->match('/', function(Silex\Application $app){
+$app->match('/', function (Request $request) use ($app){
 
     $form = $app['form.factory']->createBuilder('form')
         ->add('FileUpload', 'file')
@@ -54,7 +51,7 @@ $app->match('/', function(Silex\Application $app){
 
             }
             return $app['twig']->render('index.html.twig', array(
-                                       'message' => 'File Uploaded',
+                                       'message' => 'File was successfully uploaded!',
                                        'form' => $form->createView()
                                         ));
 
