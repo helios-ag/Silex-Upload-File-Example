@@ -1,6 +1,13 @@
 ﻿<?php
 
-$app = require __DIR__.'/../src/app.php';
+ini_set('display_errors', 1);
 
-$app->run(); 
+require_once __DIR__.'/../vendor/autoload.php';
 
+$app = new Silex\Application();
+
+require __DIR__.'/../src/app.php';
+
+require __DIR__.'/../src/controllers.php';
+
+$app->run();
