@@ -15,9 +15,12 @@ $app->match('/', function (Request $request) use ($app){
     ;
 
     $request = $app['request'];
+    $message = 'Upload a file';
 
     if ($request->isMethod('POST')) {
+        
         $form->bind($request);
+        
         if ($form->isValid()) {
             $files = $request->files->get($form->getName());
             /* Make sure that Upload Directory is properly configured and writable */
@@ -25,24 +28,17 @@ $app->match('/', function (Request $request) use ($app){
             $filename = $files['FileUpload']->getClientOriginalName();
             $files['FileUpload']->move($path,$filename);
 
+            $message = 'File was successfully uploaded!';
         }
-        $response =  $app['twig']->render(
-            'index.html.twig', 
-            array(
-                'message' => 'File was successfully uploaded!',
-                'form' => $form->createView()
-            )
-        );
-    } else {
-        $response = $app['twig']->render(
-            'index.html.twig', 
-            array(
-                'message' => 'Upload a file',
-                'form' => $form->createView()
-            )
-        );
-        
     }
+
+    $response =  $app['twig']->render(
+        'index.html.twig', 
+        array(
+            'message' => $message,
+            'form' => $form->createView()
+        )
+    );
     
     return $response;
     
