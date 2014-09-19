@@ -8,17 +8,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 $app->match('/', function (Request $request) use ($app){
 
-    $form = $app['form.factory']->createBuilder('form')
+    $form = $app['form.factory']
+        ->createBuilder('form')
         ->add('FileUpload', 'file')
-        ->getForm();
+        ->getForm()
+    ;
 
     $request = $app['request'];
 
-    if ($request->isMethod('POST'))
-    {
+    if ($request->isMethod('POST')) {
         $form->bind($request);
-        if ($form->isValid())
-        {
+        if ($form->isValid()) {
             $files = $request->files->get($form->getName());
             /* Make sure that Upload Directory is properly configured and writable */
             $path = __DIR__.'/../web/upload/';
@@ -26,31 +26,41 @@ $app->match('/', function (Request $request) use ($app){
             $files['FileUpload']->move($path,$filename);
 
         }
-        return $app['twig']->render('index.html.twig', array(
-            'message' => 'File was successfully uploaded!',
-            'form' => $form->createView()
-        ));
-
+        $response =  $app['twig']->render(
+            'index.html.twig', 
+            array(
+                'message' => 'File was successfully uploaded!',
+                'form' => $form->createView()
+            )
+        );
+    } else {
+        $response = $app['twig']->render(
+            'index.html.twig', 
+            array(
+                'message' => 'Upload a file',
+                'form' => $form->createView()
+            )
+        );
+        
     }
-    return $app['twig']->render('index.html.twig', array(
-            'message' => 'Upload a file',
-            'form' => $form->createView()
-        )
-    );
+    
+    return $response;
+    
 }, 'GET|POST');
 
 $app->error(function (\Exception $e, $code) use ($app) {
-    if ($app['debug']) {
-        return;
+    $response = null;
+    
+    if (! $app['debug']) {
+        switch ($code) {
+            case 404:
+                $message = 'The requested page could not be found.';
+                break;
+            default:
+                $message = 'We are sorry, but something went terribly wrong.';
+        }
+        $response = new Response($message, $code);
     }
-
-    switch ($code) {
-        case 404:
-            $message = 'The requested page could not be found.';
-            break;
-        default:
-            $message = 'We are sorry, but something went terribly wrong.';
-    }
-
-    return new Response($message, $code);
+    
+    return $response;
 });
