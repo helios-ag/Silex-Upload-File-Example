@@ -1,12 +1,18 @@
+Silex Upload Example (with forms)
+==================================
+
 This example app shows how to upload a file using SILEX php microframework.
 
-To get it up and running get composer first:
+To get it up and running, get composer first:
 
+```bash
 curl -s http://getcomposer.org/installer | php
+```
 
 and then install the required dependencies:
 
+```bash
 php composer.phar install
-
+```
 
 
