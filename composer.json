@@ -1,7 +1,6 @@
 {
     "require": {
-        "silex/silex": "1.0.*@dev",
-        "swiftmailer/swiftmailer": ">=4.1.2,<4.2-dev",
+        "silex/silex": "~1.2",
         "symfony/form": "~2.2",
         "symfony/validator": "~2.2",
         "symfony/config": "~2.2",
