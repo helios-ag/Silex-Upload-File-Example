@@ -6,6 +6,7 @@
         "symfony/config": "~2.2",
         "symfony/twig-bridge": "~2.2",
         "symfony/translation": "~2.2",
-        "symfony/locale": "~2.2"
+        "symfony/locale": "~2.2",
+        "symfony/security-csrf": "~2.4"
     }
 }
